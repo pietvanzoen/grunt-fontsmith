@@ -54,6 +54,7 @@ module.exports = function (grunt) {
         src = data.src,
         destCssRaw = data.destCss,
         destFontsRaw = data.destFonts,
+        template = data.template,
         that = this;
 
     // Verify everything exists
@@ -152,6 +153,12 @@ module.exports = function (grunt) {
               };
             });
 
+        // initiate custom template
+        if (template) {
+          var scssTmpl = fs.readFileSync(template, 'utf8');
+          json2fontcss.addMustacheTemplate('custom', scssTmpl);
+        }
+
         // Generate CSS
         var css = json2fontcss({
               chars: chars,
@@ -159,7 +166,7 @@ module.exports = function (grunt) {
               fontFamily: fontFamily,
               // TODO: Move off of this and onto a proper observer pattern
               // TODO: Even better, the objectifier should pre-format this
-              template: cssFormat === 'styl' ? 'stylus' : cssFormat,
+              template: (template ? 'custom' : false) || (cssFormat === 'styl' ? 'stylus' : cssFormat),
               options: cssOptions[cssFormat] || {}
             });
 
